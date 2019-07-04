@@ -201,26 +201,34 @@ public class LinkedNodeTest {
      * @return
      */
     public static LinkedNode mergeByNoRecursion(LinkedNode head1, LinkedNode head2){
+        // 有一个为null,只要合并另一个链表即可
         if(head1 == null || head2 == null){
             return head1==null?head2:head1;
         }
-        LinkedNode newHead = head1.getValue().hashCode()>head2.getValue().hashCode()?head2:head1;
-        LinkedNode cur1 = newHead == head1?head1:head2;
-        LinkedNode cur2 = newHead == head1?head2:head1;
 
+        //节点比较，以比较小的为基准节点，将另一节点合并到基准节点
+        LinkedNode newHead = head1.getValue().hashCode()<head2.getValue().hashCode()?head1:head2;
+
+        LinkedNode cur1 = newHead==head1?head1:head2;
+        LinkedNode cur2 = newHead==head1?head2:head1;
+
+        //指向处理当前节点的上一个元素
         LinkedNode pre= null;
+        //指向处理当前节点的下一个元素
         LinkedNode next = null;
         while (cur1 != null && cur2 != null){
-            if(cur1.getValue().hashCode()> cur2.getValue().hashCode()){
-                pre = cur2;
-                cur2 = cur2.getNext();
-            }else{
-                next = cur1.getNext();
-                pre.setNext(cur1);
+            if(cur1.getValue().hashCode()< cur2.getValue().hashCode()){
                 pre = cur1;
-                cur1 = next;
+                cur1 = cur1.getNext();
+            }else{
+                next = cur2.getNext();
+                pre.setNext(cur2);
+                cur2.setNext(null);
+                pre = cur2;
+                cur2 = next;
             }
         }
+        //处理链表长短不一致把多的补上/断开循环
         pre.setNext(cur2==null? cur1: cur2);
         return newHead;
     }
@@ -235,7 +243,7 @@ public class LinkedNodeTest {
      */
     private static void testLinkedTrain() {
         LinkedNode node1 = new LinkedNode(1);
-        LinkedNode node2 = new LinkedNode(2);
+        LinkedNode node2 = new LinkedNode(2666);
         LinkedNode node4 = new LinkedNode(4);
         LinkedNode node3 = new LinkedNode(3);
         node1.setNext(node2);
@@ -246,15 +254,15 @@ public class LinkedNodeTest {
         LinkedNode node33 = new LinkedNode(33);
         LinkedNode node44 = new LinkedNode(44);
         LinkedNode node55 = new LinkedNode(55);
-        node11.setNext(node22);
-        node22.setNext(node33);
-        node33.setNext(node44);
+        node11.setNext(node33);
+        node33.setNext(node22);
+        node22.setNext(node44);
         node44.setNext(node55);
 
 //        LinkedNode newHead = mergeByRecursion(node1, node11);
 //        traverse(newHead, "递归合并");
 
-        LinkedNode newHead = mergeByNoRecursion(node1, node11);
+        LinkedNode newHead = mergeByNoRecursion(node11, node1);
         traverse(newHead, "非递归合并");
 
 
